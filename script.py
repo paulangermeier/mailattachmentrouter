@@ -22,13 +22,9 @@ def subject_cleaner(subject):
     return clean_subject
 
 outlook = win32com.client.Dispatch("Outlook.Application")
-
 namespace = outlook.GetNamespace("MAPI")
-
 folder = namespace.GetDefaultFolder(config.OL_FOLDER_SENT_MAIL)
-
 items = folder.Items
-
 item = items.Item(1)
 
 if item.Attachments.Count == 0:
@@ -40,7 +36,7 @@ else:
 
     vollpfad = os.path.join(config.ZIELORDNER, ordnername)
 
-    os.mkdir(vollpfad)
+    os.mkdir(vollpfad, exist_ok=True)
 
     attachment = item.Attachments.Item(1)
     filename = attachment.FileName
