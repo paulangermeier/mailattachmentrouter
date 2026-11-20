@@ -11,22 +11,18 @@ subjects = [
 ]
 
 def remove_prefixes(subject, prefix_list):
-    uppercase_subject = subject.upper()
-    uppercase_prefix_list = [prefix.upper() for prefix in prefix_list]
+    adjusted_subject = subject.lstrip()
     flag = True
 
     while flag:
         flag = False
-        for prefix in uppercase_prefix_list:
-            if uppercase_subject.startswith(prefix):
-                uppercase_subject = uppercase_subject.removeprefix(prefix)
-                uppercase_subject = uppercase_subject.lstrip()
+        for prefix in prefix_list:
+            if adjusted_subject.upper().startswith(prefix.upper()):
+                # Annahme: in den Präfixen kommen keine Zeichen vor 
+                # die durch .upper() ihre Länge ändern
+                adjusted_subject = adjusted_subject[len(prefix):] 
+                adjusted_subject = adjusted_subject.lstrip()
                 flag = True
-                # print(prefix, flag, uppercase_subject)  
-
-    length = len(subject) - len(uppercase_subject)
-
-    adjusted_subject = subject[length:]
 
     return adjusted_subject
 
@@ -45,3 +41,7 @@ for subject in subjects:
 
 for a in adjusted_subjects:
     print(a)
+
+
+
+
