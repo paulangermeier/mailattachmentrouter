@@ -1,3 +1,5 @@
+import re
+
 prefix_list = ['WG:', 'Re:', 'Antw:', 'AW:', 'Antwort:', '[Extern]', '[External]', 'FW:', 'Fwd:']
 
 subjects = [
@@ -42,6 +44,49 @@ for subject in subjects:
 for a in adjusted_subjects:
     print(a)
 
+def extract_project_numbers(subject):
+    """Liest Haupt- und Unternummer am Anfang des Betreff aus (R2, R3).
 
+    Erwartet den Betreff nach R1 (Präfixe bereits entfernt).
+    Gibt ein Tupel (Hauptnummer, Unternummer) zurück: 
+        '512 Angebot'       -> ('512', None)
+        '560-21 Angebot'    -> ('560', '21')
+        'Urlaubsantrag'     -> (None, None)
 
+    Rückgabe als Strings, nicht als int: führende Nullen bleiben erhalten,
+    und R5/R6 vergleichen ohnehin mit Ordnernamen. Umwandlung in int erst in R4.
 
+    R3 strikt: Unternummer nur bei Bindestrich ohne Leerzeichen ('560-20').
+    '560 - 20' ergibt bewusst ('560', None), tolerante Schreibweise ist eine offene
+    Frage in der Spezifikation.
+    """
+    # re.match, weil die Nummer laut R2 und Firmen-Konvention am 
+    # Anfang des Betreffs stehen muss
+    match = re.match(r'(\d+)(?:-(\d+))?', subject)
+    if match is None: 
+        return (None, None)
+    return match.groups()
+
+project_number_cases = [
+    ('512 Angebot Lüftung', ('512', None)), #1
+    ('1000 Neubau Schule', ('1000', None)), #2
+    ('Urlaubsantrag', (None, None)), #3
+    ('5a1 Test', ('5', None)), #4
+    ('560-21 Angebot', ('560', '21')), #5
+    ('560 Angebot', ('560', None)), #6
+    ('', (None, None)), #7
+    ('512Angebot', ('512', None)), #8
+    ('560-', ('560', None)), #9
+    ('560-Angebot', ('560', None)), #10
+    ('560-20a', ('560', '20')), #11
+    ('560-05 Angebot', ('560', '05')), #12
+    ('560 -20', ('560', None)), #13 strikte Auslegung von R3; Sollwertänderung bei toleranter Schreibweise
+    ('560- 20', ('560', None)), #14 strikte Auslegung von R3; Sollwertänderung bei toleranter Schreibweise
+    ('560-21-3 Angebot', ('560', '21')), #15 Annahme: Es existieren keine Unter-Unterprojekte
+    ('Angebot 512', (None, None)), #16 
+    ('512 - 3 Angebote anbei', ('512', None)) #17
+]
+
+for eingabe, sollwert in project_number_cases:
+    istwert = extract_project_numbers(eingabe)
+    assert istwert == sollwert, f'Eingabe: {eingabe!r} \n Ist: {istwert!r} \n Soll: {sollwert!r}'
