@@ -90,3 +90,40 @@ project_number_cases = [
 for eingabe, sollwert in project_number_cases:
     istwert = extract_project_numbers(eingabe)
     assert istwert == sollwert, f'Eingabe: {eingabe!r} \n Ist: {istwert!r} \n Soll: {sollwert!r}'
+
+PROJECT_NUMBER_THRESHOLD = 500 # später nach config.py umziehen damit die Schwelle an einer zentralen Stelle ist
+
+project_numbers = extract_project_numbers('Urlaubsantrag')
+
+project_number_threshold_cases = [
+    ('501', True),
+    ('500', True),
+    ('1000', True),
+    ('499', False),
+    ('104', False)
+]
+
+def check_project_number_threshold(project_number, project_number_threshold):
+    """Prüft ob die Projektnummer gleich oder über der vorgegebenen Schwelle liegt (R4). 
+
+    Erwartet die Hauptnummer als int (project_number), das aus dem Tupel von 
+    extract_project_numbers im Aufruf erzeugt wird und die Schwelle als int 
+    (project_number_threshold).
+    None als Eingabe wird nicht abgefangen; Bevor die function aufgerufen wird, muss 
+    geprüft werden ob extract_project_numbers überhaupt eine Hauptnummer geliefert hat.
+
+    Gibt ein Bool bei Schwelle 500 zurück: 
+        500     -> True
+        1000    -> True
+        499     -> False
+
+    True bedeutet, die Mail wird weiter verarbeitet.
+    False bedeutet, die Mail wird ignoriert.
+    """
+    if project_number < project_number_threshold:
+        return False
+    return True
+
+for eingabe, sollwert in project_number_threshold_cases: 
+    istwert = check_project_number_threshold(int(eingabe), PROJECT_NUMBER_THRESHOLD)
+    assert istwert == sollwert, f'Eingabe: {eingabe!r} \n Ist: {istwert!r} \n Soll: {sollwert!r}'
