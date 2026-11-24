@@ -13,6 +13,21 @@ subjects = [
 ]
 
 def remove_prefixes(subject, prefix_list):
+    """Entfernt bekannte Präfixe am Betreffanfang (R1).
+
+    Erwartet den Betreff (subject) als String und eine Liste mit Präfix-Strings (prefix_list).
+    
+    Eine Schleife entfernt so lange Präfixe, bis keines mehr vorne steht (WG:, AW:, RE: ...)
+    dabei ist Groß- und Kleinschreibung nicht relevant.
+    Führende Leerzeichen und Leerzeichen nach dem Präfix werden entfernt.
+    Präfixe mitten im Betreff werden nicht entfernt, darum kümmert sich R2.
+
+    Zurückgegeben wird der bereinigte Betreff als String:
+        "WG: AW: 512 Rückfrage"     -> "512 Rückfrage"
+        "Angebot AW: 512"           -> "Angebot AW: 512"
+        "AW: WG: RE:"               -> ""
+        "aw: 512: Angebot"          -> "512: Angebot"
+    """
     adjusted_subject = subject.lstrip()
     flag = True
 
