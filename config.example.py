@@ -1,0 +1,1 @@
+MAILBOX_NAME = "vorname.nachname@firma.de"
