@@ -9,8 +9,7 @@ Inhalt ab.
 
 Erzeugung: Mail an sich selbst schicken, die Kopie aus "Gesendete Elemente"
 in den Fixture-Ordner verschieben, die Kopie im Posteingang löschen.
-Gefunden werden die Mails über das Betreff-Präfix, nicht über die Position;
-Dafür wurde die Hilfsfunktion find_test_mail definiert.
+Gefunden werden die Mails über das Betreff-Präfix, nicht über die Position.
 
     FX01 1 PDF angehängt + 1 Bild in den Text eingefügt
     FX02 nur 1 Bild in den Text eingefügt, kein Dateianhang
@@ -26,6 +25,7 @@ sie auch bei einem Lauf mit Ziel Projekt-Laufwerk nie dort abgelegt werden.
 """
 
 from anhaenge import filter_archivable_attachments
+from testhilfen import find_test_mail
 import config
 import win32com.client
 
@@ -33,12 +33,6 @@ outlook = win32com.client.Dispatch('Outlook.Application')
 namespace = outlook.GetNamespace('MAPI')
 folder = namespace.Folders(config.MAILBOX_NAME).Folders(config.FIXTURE_FOLDER_NAME)
 items = folder.Items
-
-def find_test_mail(items, subject_prefix):
-    for item in items:
-        if item.Subject.startswith(subject_prefix):
-            return item
-    raise ValueError(f'Keine Testmail mit Betreff-Präfix {subject_prefix!r} gefunden.')
 
 archivable_attachments_cases = [
     ('FX01', ['Angebot_Variante_A.pdf']),
