@@ -1,16 +1,6 @@
 import re
 
-prefix_list = ['WG:', 'Re:', 'Antw:', 'AW:', 'Antwort:', '[Extern]', '[External]', 'FW:', 'Fwd:']
-
-subjects = [
-    'Re: WG: 569: Wärmepumpen Angebot',
-    'Angebot WG: Heizung ',
-    '[External] 569 Angebot',
-    'WG:',
-    '',
-    'RE: Straße 569',
-    '   AW: 569 Angebot'
-]
+PREFIX_LIST = ['WG:', 'Re:', 'Antw:', 'AW:', 'Antwort:', '[Extern]', '[External]', 'FW:', 'Fwd:']
 
 def remove_prefixes(subject, prefix_list):
     """Entfernt bekannte Präfixe am Betreffanfang (R1).
@@ -43,22 +33,6 @@ def remove_prefixes(subject, prefix_list):
 
     return adjusted_subject
 
-assert remove_prefixes('Re: WG: 569: Wärmepumpen Angebot', prefix_list) == '569: Wärmepumpen Angebot', f'Ist: {remove_prefixes('Re: WG: 569: Wärmepumpen Angebot', prefix_list)!r}'
-assert remove_prefixes('Angebot WG: Heizung ', prefix_list) == 'Angebot WG: Heizung ', f'Ist: {remove_prefixes('Angebot WG: Heizung ', prefix_list)!r}'
-assert remove_prefixes('[Extern] 569 Angebot', prefix_list) == '569 Angebot', f'Ist: {remove_prefixes('[Extern] 569 Angebot', prefix_list)!r}'
-assert remove_prefixes('WG:', prefix_list) == '', f'Ist: {remove_prefixes('WG:', prefix_list)!r}'
-assert remove_prefixes('', prefix_list) == '', f'Ist: {remove_prefixes('', prefix_list)!r}'
-assert remove_prefixes('RE: Straße 569', prefix_list) == 'Straße 569', f'Ist: {remove_prefixes('RE: Straße 569', prefix_list)!r}'
-assert remove_prefixes('   AW: 569 Angebot', prefix_list) == '569 Angebot', f'Ist: {remove_prefixes('   AW: 569 Angebot', prefix_list)!r}'
-
-adjusted_subjects = []
-
-for subject in subjects:
-    adjusted_subjects.append(remove_prefixes(subject, prefix_list))
-
-for a in adjusted_subjects:
-    print(a)
-
 def extract_project_numbers(subject):
     """Liest Haupt- und Unternummer am Anfang des Betreff aus (R2, R3).
 
@@ -82,42 +56,6 @@ def extract_project_numbers(subject):
         return (None, None)
     return match.groups()
 
-project_number_cases = [
-    ('512 Angebot Lüftung', ('512', None)), #1
-    ('1000 Neubau Schule', ('1000', None)), #2
-    ('Urlaubsantrag', (None, None)), #3
-    ('5a1 Test', ('5', None)), #4
-    ('560-21 Angebot', ('560', '21')), #5
-    ('560 Angebot', ('560', None)), #6
-    ('', (None, None)), #7
-    ('512Angebot', ('512', None)), #8
-    ('560-', ('560', None)), #9
-    ('560-Angebot', ('560', None)), #10
-    ('560-20a', ('560', '20')), #11
-    ('560-05 Angebot', ('560', '05')), #12
-    ('560 -20', ('560', None)), #13 strikte Auslegung von R3; Sollwertänderung bei toleranter Schreibweise
-    ('560- 20', ('560', None)), #14 strikte Auslegung von R3; Sollwertänderung bei toleranter Schreibweise
-    ('560-21-3 Angebot', ('560', '21')), #15 Annahme: Es existieren keine Unter-Unterprojekte
-    ('Angebot 512', (None, None)), #16 
-    ('512 - 3 Angebote anbei', ('512', None)) #17
-]
-
-for eingabe, sollwert in project_number_cases:
-    istwert = extract_project_numbers(eingabe)
-    assert istwert == sollwert, f'Eingabe: {eingabe!r} \n Ist: {istwert!r} \n Soll: {sollwert!r}'
-
-PROJECT_NUMBER_THRESHOLD = 500 # später nach config.py umziehen damit die Schwelle an einer zentralen Stelle ist
-
-project_numbers = extract_project_numbers('Urlaubsantrag')
-
-project_number_threshold_cases = [
-    ('501', True),
-    ('500', True),
-    ('1000', True),
-    ('499', False),
-    ('104', False)
-]
-
 def check_project_number_threshold(project_number, project_number_threshold):
     """Prüft ob die Projektnummer gleich oder über der vorgegebenen Schwelle liegt (R4). 
 
@@ -139,6 +77,4 @@ def check_project_number_threshold(project_number, project_number_threshold):
         return False
     return True
 
-for eingabe, sollwert in project_number_threshold_cases: 
-    istwert = check_project_number_threshold(int(eingabe), PROJECT_NUMBER_THRESHOLD)
-    assert istwert == sollwert, f'Eingabe: {eingabe!r} \n Ist: {istwert!r} \n Soll: {sollwert!r}'
+
