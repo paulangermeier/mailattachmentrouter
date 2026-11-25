@@ -1,3 +1,30 @@
+"""Tests für R17 (filter_archivable_attachments) gegen Outlook-Fixtures.
+
+Fixtures
+--------
+Die Testmails liegen im Outlook-Ordner config.FISTURE_FOLDER_NAME
+(neben "Gesendete Elemente", im eigenen Postfach). Der Ordner darf nicht
+verändert werden, denn die definierten Sollwerte unten hängen von seinem
+Inhalt ab.
+
+Erzeugung: Mail an sich selbst schicken, die Kopie aus "Gesendete Elemente"
+in den Fixture-Ordner verschieben, die Kopie im Posteingang löschen.
+Gefunden werden die Mails über das Betreff-Präfix, nicht über die Position;
+Dafür wurde die Hilfsfunktion find_test_mail definiert.
+
+    FX01 1 PDF angehängt + 1 Bild in den Text eingefügt
+    FX02 nur 1 Bild in den Text eingefügt, kein Dateianhang
+    FX03 nur Text, keine Anhänge
+    FX04 2 verschiedene PDFs angehängt
+    FX05 2 Dateien mit gleichem Namen, unterschiedlicher Inhalt - Stichwort
+         späterer Überschreibungsschutz
+    FX06 Antwort auf eine externe Mail mit Logos im zitierten Verlauf
+         + 1 PDF angehängt (realistischer Hauptfall für eingebettete Bilder)
+
+Sicherheit: Alle Betreffe beginnen mit "FX", damit R2 sie aussortiert und 
+sie auch bei einem Lauf mit Ziel Projekt-Laufwerk nie dort abgelegt werden.
+"""
+
 from anhaenge import filter_archivable_attachments
 import config
 import win32com.client
